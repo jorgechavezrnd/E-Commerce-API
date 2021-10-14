@@ -1,8 +1,7 @@
-﻿namespace ECommerceAPI.Model
+﻿namespace ECommerceAPI.Dto.Request
 {
-    public class Category
+    public class CategoryRequest
     {
-        public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

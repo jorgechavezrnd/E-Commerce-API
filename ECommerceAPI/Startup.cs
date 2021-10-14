@@ -1,13 +1,9 @@
-using ECommerceAPI.Model;
+using ECommerceAPI.Dto.Response;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI
 {
@@ -18,7 +14,15 @@ namespace ECommerceAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<List<Category>>(new List<Category>());
+            services.AddSingleton(new CategoryDtoCollectionResponse
+            {
+                Collection = new List<CategoryDto>()
+            });
+
+            services.AddSingleton(new ProductDtoCollectionResponse
+            {
+                Collection = new List<ProductDto>()
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
