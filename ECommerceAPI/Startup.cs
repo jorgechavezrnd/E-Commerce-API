@@ -1,6 +1,8 @@
+using ECommerceAPI.DataAccess;
 using ECommerceAPI.Dto.Response;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
@@ -22,6 +24,11 @@ namespace ECommerceAPI
             services.AddSingleton(new ProductDtoCollectionResponse
             {
                 Collection = new List<ProductDto>()
+            });
+
+            services.AddDbContext<ECommerceDbContext>(options =>
+            {
+                options.UseSqlServer("Server=localhost;Database=EcommergeDb;Integrated Security=true");
             });
         }
 

@@ -1,6 +1,9 @@
-﻿using ECommerceAPI.Dto.Request;
+﻿using ECommerceAPI.DataAccess;
+using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
+using ECommerceAPI.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
@@ -10,18 +13,38 @@ namespace ECommerceAPI.Controllers
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
     {
-        private readonly CategoryDtoCollectionResponse _categories;
+        private readonly ECommerceDbContext _dbContext;
 
-        public CategoriesController(CategoryDtoCollectionResponse categories)
+        public CategoriesController(ECommerceDbContext dbContext)
         {
-            _categories = categories;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
         public IActionResult GetCategories()
         {
-            _categories.Success = true;
-            return Ok(_categories);
+            var response = new CategoryDtoCollectionResponse();
+
+            try
+            {
+                response.Collection = _dbContext.Categories
+                    .Where(p => p.Status)
+                    .Select(p => new CategoryDto
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description
+                    })
+                    .ToList();
+
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessage = ex.Message;
+            }
+
+            return Ok(response);
         }
 
         [HttpGet]
@@ -30,7 +53,7 @@ namespace ECommerceAPI.Controllers
         {
             var response = new BaseResponse<CategoryDto>();
 
-            var find = _categories.Collection.FirstOrDefault(p => p.Id == id);
+            var find = _dbContext.Categories.FirstOrDefault(p => p.Id == id && p.Status);
 
             if (find == null)
             {
@@ -38,7 +61,12 @@ namespace ECommerceAPI.Controllers
             }
 
             response.Success = true;
-            response.Result = find;
+            response.Result = new CategoryDto
+            {
+                Id = find.Id,
+                Name = find.Name,
+                Description = find.Description
+            };
 
             return Ok(response);
         }
@@ -48,14 +76,14 @@ namespace ECommerceAPI.Controllers
         {
             var response = new BaseResponse<string>();
 
-            var category = new CategoryDto
+            var category = new Category
             {
-                Id = Guid.NewGuid().ToString(),
                 Name = request.Name,
                 Description = request.Description
             };
 
-            _categories.Collection.Add(category);
+            _dbContext.Categories.Add(category);
+            _dbContext.SaveChanges();
 
             response.Success = true;
             response.Result = category.Id;
@@ -71,7 +99,7 @@ namespace ECommerceAPI.Controllers
         public IActionResult PutCategories(string id, [FromBody] CategoryRequest request)
         {
             var response = new BaseResponse<string>();
-            var find = _categories.Collection.FirstOrDefault(p => p.Id == id);
+            var find = _dbContext.Categories.FirstOrDefault(p => p.Id == id);
 
             if (find == null)
             {
@@ -80,6 +108,10 @@ namespace ECommerceAPI.Controllers
 
             find.Description = request.Description;
             find.Name = request.Name;
+
+            _dbContext.Categories.Attach(find);
+            _dbContext.Entry(find).State = EntityState.Modified;
+            _dbContext.SaveChanges();
 
             response.Success = true;
             response.Result = id;
@@ -92,14 +124,17 @@ namespace ECommerceAPI.Controllers
         public IActionResult DeleteCategories(string id)
         {
             var response = new BaseResponse<string>();
-            var find = _categories.Collection.FirstOrDefault(p => p.Id == id);
+            var find = _dbContext.Categories.FirstOrDefault(p => p.Id == id);
 
             if (find == null)
             {
                 return NotFound(response);
             }
 
-            _categories.Collection.Remove(find);
+            find.Status = false;
+            _dbContext.Categories.Attach(find);
+            _dbContext.Entry(find).State = EntityState.Modified;
+            _dbContext.SaveChanges();
 
             response.Success = true;
             response.Result = id;
