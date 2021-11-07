@@ -1,11 +1,7 @@
-﻿using ECommerceAPI.DataAccess;
-using ECommerceAPI.Dto.Request;
-using ECommerceAPI.Dto.Response;
-using ECommerceAPI.Entities;
+﻿using ECommerceAPI.Dto.Request;
+using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace ECommerceAPI.Controllers
 {
@@ -13,80 +9,37 @@ namespace ECommerceAPI.Controllers
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
     {
-        private readonly ECommerceDbContext _dbContext;
+        private readonly ICategoryService _service;
 
-        public CategoriesController(ECommerceDbContext dbContext)
+        public CategoriesController(ICategoryService service)
         {
-            _dbContext = dbContext;
+            _service = service;
         }
 
         [HttpGet]
-        public IActionResult GetCategories()
+        public async Task<IActionResult> GetCategories(string filter, int page = 1, int rows = 10)
         {
-            var response = new CategoryDtoCollectionResponse();
-
-            try
-            {
-                response.Collection = _dbContext.Categories
-                    .Where(p => p.Status)
-                    .Select(p => new CategoryDto
-                    {
-                        Id = p.Id,
-                        Name = p.Name,
-                        Description = p.Description
-                    })
-                    .ToList();
-
-                response.Success = true;
-            }
-            catch (Exception ex)
-            {
-                response.ErrorMessage = ex.Message;
-            }
-
-            return Ok(response);
+            return Ok(await _service.ListAsync(filter, page, rows));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult GetCategories(string id)
+        public async Task<IActionResult> GetCategories(string id)
         {
-            var response = new BaseResponse<CategoryDto>();
+            var response = await _service.GetAsync(id);
 
-            var find = _dbContext.Categories.FirstOrDefault(p => p.Id == id && p.Status);
-
-            if (find == null)
+            if (!response.Success)
             {
                 return NotFound(response);
             }
-
-            response.Success = true;
-            response.Result = new CategoryDto
-            {
-                Id = find.Id,
-                Name = find.Name,
-                Description = find.Description
-            };
 
             return Ok(response);
         }
 
         [HttpPost]
-        public IActionResult PostCategories([FromBody] CategoryRequest request)
+        public async Task<IActionResult> PostCategories([FromBody] CategoryRequest request)
         {
-            var response = new BaseResponse<string>();
-
-            var category = new Category
-            {
-                Name = request.Name,
-                Description = request.Description
-            };
-
-            _dbContext.Categories.Add(category);
-            _dbContext.SaveChanges();
-
-            response.Success = true;
-            response.Result = category.Id;
+            var response = await _service.CreateAsync(request);
 
             return CreatedAtAction("GetCategories", new
             {
@@ -96,50 +49,16 @@ namespace ECommerceAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult PutCategories(string id, [FromBody] CategoryRequest request)
+        public async Task<IActionResult> PutCategories(string id, [FromBody] CategoryRequest request)
         {
-            var response = new BaseResponse<string>();
-            var find = _dbContext.Categories.FirstOrDefault(p => p.Id == id);
-
-            if (find == null)
-            {
-                return NotFound(response);
-            }
-
-            find.Description = request.Description;
-            find.Name = request.Name;
-
-            _dbContext.Categories.Attach(find);
-            _dbContext.Entry(find).State = EntityState.Modified;
-            _dbContext.SaveChanges();
-
-            response.Success = true;
-            response.Result = id;
-
-            return Ok(response);
+            return Ok(await _service.UpdateAsync(id, request));
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteCategories(string id)
+        public async Task<IActionResult> DeleteCategories(string id)
         {
-            var response = new BaseResponse<string>();
-            var find = _dbContext.Categories.FirstOrDefault(p => p.Id == id);
-
-            if (find == null)
-            {
-                return NotFound(response);
-            }
-
-            find.Status = false;
-            _dbContext.Categories.Attach(find);
-            _dbContext.Entry(find).State = EntityState.Modified;
-            _dbContext.SaveChanges();
-
-            response.Success = true;
-            response.Result = id;
-
-            return Ok(response);
+            return Ok(await _service.DeleteAsync(id));
         }
 
     }

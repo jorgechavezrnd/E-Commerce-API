@@ -4,4 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ECommerceAPI.DataAccess\ECommerceAPI.DataAccess.csproj" />
+    <ProjectReference Include="..\ECommerceAPI.Dto\ECommerceAPI.Dto.csproj" />
+  </ItemGroup>
+
 </Project>
