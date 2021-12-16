@@ -23,12 +23,10 @@ namespace ECommerceAPI
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<ICategoryService, CategoryService>();
 
-            services.AddControllers();
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IProductService, ProductService>();
 
-            services.AddSingleton(new ProductDtoCollectionResponse
-            {
-                Collection = new List<ProductDto>()
-            });
+            services.AddControllers();
 
             services.AddDbContext<ECommerceDbContext>(options =>
             {

@@ -1,8 +1,7 @@
 ﻿using ECommerceAPI.Dto.Request;
-using ECommerceAPI.Dto.Response;
+using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace ECommerceAPI.Controllers
 {
@@ -10,60 +9,56 @@ namespace ECommerceAPI.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly ProductDtoCollectionResponse _products;
+        private readonly IProductService _service;
 
-        public ProductsController(ProductDtoCollectionResponse products)
+        public ProductsController(IProductService service)
         {
-            _products = products;
+            _service = service;
         }
 
         [HttpGet]
-        public IActionResult GetProducts()
+        public async Task<IActionResult> GetProducts(string filter, int page = 1, int rows = 10)
         {
-            _products.Success = true;
-            return Ok(_products);
+            return Ok(await _service.ListAsync(filter, page, rows));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult GetProducts(string id)
+        public async Task<IActionResult> GetProducts(string id)
         {
-            var response = new BaseResponse<ProductDto>();
+            var response = await _service.GetAsync(id);
 
-            var find = _products.Collection.FirstOrDefault(p => p.Id == id);
-
-            if (find == null)
+            if (!response.Success)
             {
-                return NotFound(response);
+                return NotFound();
             }
-
-            response.Success = true;
-            response.Result = find;
 
             return Ok(response);
         }
 
         [HttpPost]
-        public IActionResult PostProducts([FromBody] ProductRequest request)
+        public async Task<IActionResult> PostProducts([FromBody] ProductRequest request)
         {
-            var response = new BaseResponse<string>();
-
-            var product = new ProductDto
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = request.Name,
-                Description = request.Description,
-                Url = request.FileName
-            };
-
-            _products.Collection.Add(product);
-            response.Success = true;
-            response.Result = product.Id;
+            var response = await _service.CreateAsync(request);
 
             return CreatedAtAction("GetProducts", new
             {
-                Id = product.Id
+                id = response.Result
             }, response);
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> PutProducts(string id, [FromBody] ProductRequest request)
+        {
+            return Ok(await _service.UpdateAsync(id, request));
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteProducts(string id)
+        {
+            return Ok(await _service.DeleteAsync(id));
         }
     }
 }
