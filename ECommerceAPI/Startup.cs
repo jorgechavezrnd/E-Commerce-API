@@ -30,7 +30,7 @@ namespace ECommerceAPI
 
             services.AddDbContext<ECommerceDbContext>(options =>
             {
-                options.UseSqlServer("Server=localhost;Database=EcommergeDb;Integrated Security=true");
+                options.UseSqlServer("Server=localhost;Database=EcommerceDb;Integrated Security=true");
                 options.LogTo(Console.WriteLine, LogLevel.Information);
             });
         }

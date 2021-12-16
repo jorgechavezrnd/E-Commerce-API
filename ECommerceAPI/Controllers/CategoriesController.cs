@@ -60,6 +60,5 @@ namespace ECommerceAPI.Controllers
         {
             return Ok(await _service.DeleteAsync(id));
         }
-
     }
 }

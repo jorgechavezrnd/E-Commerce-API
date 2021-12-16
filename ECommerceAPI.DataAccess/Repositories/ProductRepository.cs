@@ -18,7 +18,7 @@ namespace ECommerceAPI.DataAccess.Repositories
         public async Task<(ICollection<Product> collection, int total)> ListAsync(string filter, int page, int rows)
         {
             var collection = await _dbContext.Set<Product>()
-                .Where(p => p.Name.StartsWith(filter))
+                .Where(p => p.Name.StartsWith(filter) && p.Status)
                 .OrderBy(p => p.Name)
                 .AsNoTracking()
                 .Skip((page - 1) * rows)
@@ -26,7 +26,7 @@ namespace ECommerceAPI.DataAccess.Repositories
                 .ToListAsync();
 
             var totalCount = await _dbContext.Set<Product>()
-                .Where(p => p.Name.StartsWith(filter))
+                .Where(p => p.Name.StartsWith(filter) && p.Status)
                 .AsNoTracking()
                 .CountAsync();
 
