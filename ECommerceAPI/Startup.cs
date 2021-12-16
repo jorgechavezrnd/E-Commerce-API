@@ -1,6 +1,5 @@
 using ECommerceAPI.DataAccess;
 using ECommerceAPI.DataAccess.Repositories;
-using ECommerceAPI.Dto.Response;
 using ECommerceAPI.Services.Implementations;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
 
 namespace ECommerceAPI
 {
