@@ -1,6 +1,8 @@
 ﻿using ECommerceAPI.Dto.Request;
+using ECommerceAPI.Dto.Response;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Threading.Tasks;
 
 namespace ECommerceAPI.Controllers
@@ -17,6 +19,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [SwaggerResponse(200, "Ok", typeof(CategoryDtoCollectionResponse))]
         public async Task<IActionResult> GetCategories(string filter, int page = 1, int rows = 10)
         {
             return Ok(await _service.ListAsync(filter, page, rows));
@@ -24,6 +27,8 @@ namespace ECommerceAPI.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [SwaggerResponse(200, "Ok", typeof(BaseResponse<CategoryDto>))]
+        [SwaggerResponse(404, "Not Found", typeof(BaseResponse<CategoryDto>))]
         public async Task<IActionResult> GetCategories(string id)
         {
             var response = await _service.GetAsync(id);
@@ -37,6 +42,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpPost]
+        [SwaggerResponse(201, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> PostCategories([FromBody] CategoryRequest request)
         {
             var response = await _service.CreateAsync(request);
@@ -49,6 +55,7 @@ namespace ECommerceAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [SwaggerResponse(200, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> PutCategories(string id, [FromBody] CategoryRequest request)
         {
             return Ok(await _service.UpdateAsync(id, request));
@@ -56,6 +63,7 @@ namespace ECommerceAPI.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [SwaggerResponse(200, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> DeleteCategories(string id)
         {
             return Ok(await _service.DeleteAsync(id));
