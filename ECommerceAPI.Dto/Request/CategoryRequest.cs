@@ -6,7 +6,7 @@ namespace ECommerceAPI.Dto.Request
     {
         [Required(ErrorMessage = "El campo Name es obligatorio")]
         public string Name { get; set; }
-        [StringLength(20, ErrorMessage = "El ancho del campo es muy largo")]
+        [StringLength(200, ErrorMessage = "El ancho del campo es muy largo")]
         public string Description { get; set; }
     }
 }

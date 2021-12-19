@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Services.Implementations
 {
-    public class ProductService : IProductService
+    public class CustomerService : ICustomerService
     {
-        private readonly IProductRepository _repository;
-        private readonly ILogger<ProductService> _logger;
+        private readonly ICustomerRepository _repository;
+        private readonly ILogger<CustomerService> _logger;
 
-        public ProductService(IProductRepository repository, ILogger<ProductService> logger)
+        public CustomerService(ICustomerRepository repository, ILogger<CustomerService> logger)
         {
             _repository = repository;
             _logger = logger;
         }
 
-        public async Task<ProductDtoCollectionResponse> ListAsync(string filter, int page, int rows)
+        public async Task<CustomerDtoCollectionResponse> GetCollectionAsync(string filter, int page, int rows)
         {
-            var response = new ProductDtoCollectionResponse();
+            var response = new CustomerDtoCollectionResponse();
 
             try
             {
@@ -31,18 +31,17 @@ namespace ECommerceAPI.Services.Implementations
                     .GetCollectionAsync(filter ?? string.Empty, page, rows);
 
                 response.Collection = tupla.collection
-                    .Select(p => new ProductDto
+                    .Select(c => new CustomerDto
                     {
-                        Id = p.Id,
-                        ProductName = p.ProductName,
-                        ProductDescription = p.ProductDescription,
-                        UrlProduct = p.UrlProduct,
-                        UnitPrice = p.UnitPrice,
-                        Category = p.Category
+                        Id = c.Id,
+                        Name = c.Name,
+                        LastName = c.LastName,
+                        Email = c.Email,
+                        BirthDate = c.BirthDate.ToString("yyyy-MM-dd"),
+                        Dni = c.Dni
                     })
                     .ToList();
 
-                
                 var totalPages = tupla.total / rows;
                 if (tupla.total % rows > 0)
                     totalPages++;
@@ -54,36 +53,35 @@ namespace ECommerceAPI.Services.Implementations
             {
                 response.Success = false;
                 response.ErrorMessage = ex.Message;
-                _logger.LogCritical(ex.Message);
+                _logger.LogCritical($"{ex.Message} {ex.StackTrace}");
             }
 
             return response;
         }
 
-        public async Task<BaseResponse<ProductSingleDto>> GetAsync(string id)
+        public async Task<BaseResponse<CustomerDto>> GetCustomerAsync(string id)
         {
-            var response = new BaseResponse<ProductSingleDto>();
+            var response = new BaseResponse<CustomerDto>();
 
             try
             {
-                var product = await _repository.GetItemAsync(id);
+                var customer = await _repository.GetItemAsync(id);
 
-                if (product == null)
+                if (customer == null)
                 {
-                    response.Success = false;
+                    response.Success = true;
                     response.ErrorMessage = "Registro no encontrado";
                     return response;
                 }
 
-                response.Result = new ProductSingleDto
+                response.Result = new CustomerDto
                 {
-                    Id = product.Id,
-                    ProductName = product.Name,
-                    ProductDescription = product.Description,
-                    CategoryId = product.CategoryId,
-                    Active = product.Active,
-                    UnitPrice = product.UnitPrice,
-                    UrlProduct = product.ProductUrl
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    LastName = customer.LastName,
+                    Email = customer.Email,
+                    BirthDate = customer.BirthDate.ToString("yyyy-MM-dd"),
+                    Dni = customer.Dni
                 };
 
                 response.Success = true;
@@ -99,23 +97,22 @@ namespace ECommerceAPI.Services.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<string>> CreateAsync(ProductDtoRequest request)
+        public async Task<BaseResponse<string>> CreateAsync(CustomerDtoRequest request)
         {
             var response = new BaseResponse<string>();
 
             try
             {
-                var product = new Product
+                var customer = new Customer
                 {
                     Name = request.Name,
-                    Description = request.Description,
-                    Active = request.Active,
-                    CategoryId = request.CategoryId,
-                    ProductUrl = request.UrlImage,
-                    UnitPrice = request.UnitPrice
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    BirthDate = DateTime.ParseExact(request.BirthDate, "yyyy-MM-dd", null),
+                    Dni = request.Dni
                 };
 
-                response.Result = await _repository.CreateAsync(product);
+                response.Result = await _repository.CreateAsync(customer);
                 response.Success = true;
             }
             catch (Exception ex)
@@ -129,24 +126,23 @@ namespace ECommerceAPI.Services.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<string>> UpdateAsync(string id, ProductDtoRequest request)
+        public async Task<BaseResponse<string>> UpdateAsync(string id, CustomerDtoRequest request)
         {
             var response = new BaseResponse<string>();
 
             try
             {
-                var product = new Product
+                var customer = new Customer
                 {
                     Name = request.Name,
-                    Description = request.Description,
-                    Active = request.Active,
-                    CategoryId = request.CategoryId,
-                    ProductUrl = request.UrlImage,
-                    UnitPrice = request.UnitPrice,
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    BirthDate = DateTime.ParseExact(request.BirthDate, "yyyy-MM-dd", null),
+                    Dni = request.Dni,
                     Id = id
                 };
 
-                await _repository.UpdateAsync(product);
+                await _repository.UpdateAsync(customer);
 
                 response.Success = true;
                 response.Result = id;

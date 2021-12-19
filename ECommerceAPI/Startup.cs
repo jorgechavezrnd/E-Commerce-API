@@ -33,12 +33,16 @@ namespace ECommerceAPI
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IProductService, ProductService>();
 
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
+            services.AddTransient<ICustomerService, CustomerService>();
+
             services.AddControllers();
 
             services.AddDbContext<ECommerceDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
-                options.LogTo(Console.WriteLine, LogLevel.Information);
+                options.LogTo(Console.WriteLine, LogLevel.Information)
+                    .EnableSensitiveDataLogging();
             });
 
             services.AddSwaggerGen(c =>

@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Entities;
+using ECommerceAPI.Entities.Complex;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace ECommerceAPI.DataAccess.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<(ICollection<Product> collection, int total)> ListAsync(string filter, int page, int rows)
+        public async Task<(ICollection<ProductInfo> collection, int total)> GetCollectionAsync(string filter, int page, int rows)
         {
             var collection = await _dbContext.Set<Product>()
                 .Where(p => p.Name.StartsWith(filter) && p.Status)
@@ -23,6 +24,15 @@ namespace ECommerceAPI.DataAccess.Repositories
                 .AsNoTracking()
                 .Skip((page - 1) * rows)
                 .Take(rows)
+                .Select(p => new ProductInfo
+                {
+                    Id = p.Id,
+                    ProductName = p.Name,
+                    ProductDescription = p.Description,
+                    Category = p.Category.Name,
+                    UnitPrice = p.UnitPrice,
+                    UrlProduct = p.ProductUrl
+                })
                 .ToListAsync();
 
             var totalCount = await _dbContext.Set<Product>()

@@ -8,11 +8,11 @@ namespace ECommerceAPI.Services.Interfaces
     {
         Task<ProductDtoCollectionResponse> ListAsync(string filter, int page, int rows);
 
-        Task<BaseResponse<ProductDto>> GetAsync(string id);
+        Task<BaseResponse<ProductSingleDto>> GetAsync(string id);
 
-        Task<BaseResponse<string>> CreateAsync(ProductRequest request);
+        Task<BaseResponse<string>> CreateAsync(ProductDtoRequest request);
 
-        Task<BaseResponse<string>> UpdateAsync(string id, ProductRequest request);
+        Task<BaseResponse<string>> UpdateAsync(string id, ProductDtoRequest request);
 
         Task<BaseResponse<string>> DeleteAsync(string id);
     }
