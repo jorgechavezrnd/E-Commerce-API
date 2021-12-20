@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.DataAccess.Repositories;
+﻿using AutoMapper;
+using ECommerceAPI.DataAccess.Repositories;
 using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
 using ECommerceAPI.Entities;
@@ -14,11 +15,13 @@ namespace ECommerceAPI.Services.Implementations
     {
         private readonly ICategoryRepository _repository;
         private readonly ILogger<CategoryService> _logger;
+        private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryRepository repository, ILogger<CategoryService> logger)
+        public CategoryService(ICategoryRepository repository, ILogger<CategoryService> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<CategoryDtoCollectionResponse> ListAsync(string filter, int page, int rows)
@@ -30,12 +33,7 @@ namespace ECommerceAPI.Services.Implementations
                 var result = await _repository.ListAsync(filter ?? string.Empty, page, rows);
 
                 response.Collection = result.collection
-                    .Select(p => new CategoryDto
-                    {
-                        Id = p.Id,
-                        Name = p.Name,
-                        Description = p.Description
-                    })
+                    .Select(p => _mapper.Map<CategoryDto>(p))
                     .ToList();
 
                 response.TotalPages = result.total / rows;
@@ -66,16 +64,11 @@ namespace ECommerceAPI.Services.Implementations
                 if (category == null)
                 {
                     response.Success = false;
-                    response.ErrorMessage = "Registro no encontrado";
+                    response.ErrorMessage = Constants.NotFound;
                     return response;
                 }
 
-                response.Result = new CategoryDto
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                    Description = category.Description
-                };
+                response.Result = _mapper.Map<CategoryDto>(category);
 
                 response.Success = true;
             }
@@ -95,12 +88,9 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                response.Result = await _repository.CreateAsync(new Category
-                {
-                    Name = request.Name,
-                    Description = request.Description
-                });
+                var category = _mapper.Map<Category>(request);
 
+                response.Result = await _repository.CreateAsync(category);
                 response.Success = true;
             }
             catch (Exception ex)
@@ -119,12 +109,10 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                await _repository.UpdateAsync(new Category
-                {
-                    Id = id,
-                    Name = request.Name,
-                    Description = request.Description
-                });
+                var category = _mapper.Map<Category>(request);
+                category.Id = id;
+
+                await _repository.UpdateAsync(category);
 
                 response.Result = id;
                 response.Success = true;

@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.DataAccess.Repositories;
+﻿using AutoMapper;
+using ECommerceAPI.DataAccess.Repositories;
 using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
 using ECommerceAPI.Entities;
@@ -14,11 +15,13 @@ namespace ECommerceAPI.Services.Implementations
     {
         private readonly IProductRepository _repository;
         private readonly ILogger<ProductService> _logger;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository repository, ILogger<ProductService> logger)
+        public ProductService(IProductRepository repository, ILogger<ProductService> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<ProductDtoCollectionResponse> ListAsync(string filter, int page, int rows)
@@ -31,15 +34,7 @@ namespace ECommerceAPI.Services.Implementations
                     .GetCollectionAsync(filter ?? string.Empty, page, rows);
 
                 response.Collection = tupla.collection
-                    .Select(p => new ProductDto
-                    {
-                        Id = p.Id,
-                        ProductName = p.ProductName,
-                        ProductDescription = p.ProductDescription,
-                        UrlProduct = p.UrlProduct,
-                        UnitPrice = p.UnitPrice,
-                        Category = p.Category
-                    })
+                    .Select(p => _mapper.Map<ProductDto>(p))
                     .ToList();
 
                 
@@ -71,20 +66,11 @@ namespace ECommerceAPI.Services.Implementations
                 if (product == null)
                 {
                     response.Success = false;
-                    response.ErrorMessage = "Registro no encontrado";
+                    response.ErrorMessage = Constants.NotFound;
                     return response;
                 }
 
-                response.Result = new ProductSingleDto
-                {
-                    Id = product.Id,
-                    ProductName = product.Name,
-                    ProductDescription = product.Description,
-                    CategoryId = product.CategoryId,
-                    Active = product.Active,
-                    UnitPrice = product.UnitPrice,
-                    UrlProduct = product.ProductUrl
-                };
+                response.Result = _mapper.Map<ProductSingleDto>(product);
 
                 response.Success = true;
             }
@@ -105,15 +91,7 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                var product = new Product
-                {
-                    Name = request.Name,
-                    Description = request.Description,
-                    Active = request.Active,
-                    CategoryId = request.CategoryId,
-                    ProductUrl = request.UrlImage,
-                    UnitPrice = request.UnitPrice
-                };
+                var product = _mapper.Map<Product>(request);
 
                 response.Result = await _repository.CreateAsync(product);
                 response.Success = true;
@@ -135,16 +113,8 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                var product = new Product
-                {
-                    Name = request.Name,
-                    Description = request.Description,
-                    Active = request.Active,
-                    CategoryId = request.CategoryId,
-                    ProductUrl = request.UrlImage,
-                    UnitPrice = request.UnitPrice,
-                    Id = id
-                };
+                var product = _mapper.Map<Product>(request);
+                product.Id = id;
 
                 await _repository.UpdateAsync(product);
 

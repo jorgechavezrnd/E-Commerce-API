@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.DataAccess.Repositories;
+﻿using AutoMapper;
+using ECommerceAPI.DataAccess.Repositories;
 using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
 using ECommerceAPI.Entities;
@@ -14,11 +15,13 @@ namespace ECommerceAPI.Services.Implementations
     {
         private readonly ICustomerRepository _repository;
         private readonly ILogger<CustomerService> _logger;
+        private readonly IMapper _mapper;
 
-        public CustomerService(ICustomerRepository repository, ILogger<CustomerService> logger)
+        public CustomerService(ICustomerRepository repository, ILogger<CustomerService> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<CustomerDtoCollectionResponse> GetCollectionAsync(string filter, int page, int rows)
@@ -31,15 +34,7 @@ namespace ECommerceAPI.Services.Implementations
                     .GetCollectionAsync(filter ?? string.Empty, page, rows);
 
                 response.Collection = tupla.collection
-                    .Select(c => new CustomerDto
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        LastName = c.LastName,
-                        Email = c.Email,
-                        BirthDate = c.BirthDate.ToString("yyyy-MM-dd"),
-                        Dni = c.Dni
-                    })
+                    .Select(c => _mapper.Map<CustomerDto>(c))
                     .ToList();
 
                 var totalPages = tupla.total / rows;
@@ -70,19 +65,11 @@ namespace ECommerceAPI.Services.Implementations
                 if (customer == null)
                 {
                     response.Success = true;
-                    response.ErrorMessage = "Registro no encontrado";
+                    response.ErrorMessage = Constants.NotFound;
                     return response;
                 }
 
-                response.Result = new CustomerDto
-                {
-                    Id = customer.Id,
-                    Name = customer.Name,
-                    LastName = customer.LastName,
-                    Email = customer.Email,
-                    BirthDate = customer.BirthDate.ToString("yyyy-MM-dd"),
-                    Dni = customer.Dni
-                };
+                response.Result = _mapper.Map<CustomerDto>(customer);
 
                 response.Success = true;
             }
@@ -103,14 +90,7 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                var customer = new Customer
-                {
-                    Name = request.Name,
-                    LastName = request.LastName,
-                    Email = request.Email,
-                    BirthDate = DateTime.ParseExact(request.BirthDate, "yyyy-MM-dd", null),
-                    Dni = request.Dni
-                };
+                var customer = _mapper.Map<Customer>(request);
 
                 response.Result = await _repository.CreateAsync(customer);
                 response.Success = true;
@@ -132,15 +112,8 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                var customer = new Customer
-                {
-                    Name = request.Name,
-                    LastName = request.LastName,
-                    Email = request.Email,
-                    BirthDate = DateTime.ParseExact(request.BirthDate, "yyyy-MM-dd", null),
-                    Dni = request.Dni,
-                    Id = id
-                };
+                var customer = _mapper.Map<Customer>(request);
+                customer.Id = id;
 
                 await _repository.UpdateAsync(customer);
 

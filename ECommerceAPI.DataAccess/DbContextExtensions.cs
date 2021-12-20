@@ -28,11 +28,14 @@ namespace ECommerceAPI.DataAccess
             where TEntityBase: EntityBase
         {
             var registro = await context.Set<TEntityBase>()
+                .AsNoTracking()
                 .SingleOrDefaultAsync(p => p.Id == entity.Id);
 
             if (registro == null) return;
 
             registro = mapper.Map<TEntityBase>(entity);
+
+            context.Entry(registro).State = EntityState.Modified;
             
             await context.SaveChangesAsync();
         }
@@ -45,10 +48,10 @@ namespace ECommerceAPI.DataAccess
 
             if (registro == null) return;
 
-            entity.Status = false;
+            registro.Status = false;
 
-            context.Set<TEntityBase>().Attach(entity);
-            context.Entry(entity).State = EntityState.Modified;
+            context.Set<TEntityBase>().Attach(registro);
+            context.Entry(registro).State = EntityState.Modified;
             await context.SaveChangesAsync();
         }
     }

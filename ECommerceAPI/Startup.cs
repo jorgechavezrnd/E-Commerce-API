@@ -1,7 +1,9 @@
 using ECommerceAPI.DataAccess;
 using ECommerceAPI.DataAccess.Repositories;
+using ECommerceAPI.Entities;
 using ECommerceAPI.Services.Implementations;
 using ECommerceAPI.Services.Interfaces;
+using ECommerceAPI.Services.Profiles;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +47,16 @@ namespace ECommerceAPI
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
                 options.LogTo(Console.WriteLine, LogLevel.Information)
                     .EnableSensitiveDataLogging();
+            });
+
+            services.AddAutoMapper(options =>
+            {
+                options.AddMaps(typeof(Category));
+                options.AddMaps(typeof(Customer));
+                options.AddMaps(typeof(Product));
+                options.AddProfile<CategoryProfile>();
+                options.AddProfile<CustomerProfile>();
+                options.AddProfile<ProductProfile>();
             });
 
             services.AddSwaggerGen(c =>
