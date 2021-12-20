@@ -27,13 +27,15 @@ namespace ECommerceAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ECommerceDbContext>();
+
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<ICategoryService, CategoryService>();
 
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<ICustomerService, CustomerService>();
 
-            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddTransient<IProductService, ProductService>();
 
             services.AddControllers();

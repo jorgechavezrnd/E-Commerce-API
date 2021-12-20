@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.Entities;
+﻿using AutoMapper;
+using ECommerceAPI.Entities;
 using ECommerceAPI.Entities.Complex;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -10,10 +11,12 @@ namespace ECommerceAPI.DataAccess.Repositories
     public class ProductRepository : IProductRepository
     {
         private readonly ECommerceDbContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public ProductRepository(ECommerceDbContext dbContext)
+        public ProductRepository(ECommerceDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public async Task<(ICollection<ProductInfo> collection, int total)> GetCollectionAsync(string filter, int page, int rows)
@@ -45,36 +48,22 @@ namespace ECommerceAPI.DataAccess.Repositories
 
         public async Task<Product> GetItemAsync(string id)
         {
-            return await _dbContext.Set<Product>()
-                .SingleOrDefaultAsync(p => p.Id == id);
+            return await _dbContext.Select<Product>(id);
         }
 
         public async Task<string> CreateAsync(Product entity)
         {
-            await _dbContext.Set<Product>().AddAsync(entity);
-            _dbContext.Entry(entity).State = EntityState.Added;
-            await _dbContext.SaveChangesAsync();
-
-            return entity.Id;
+            return await _dbContext.Insert(entity);
         }
 
         public async Task UpdateAsync(Product entity)
         {
-            _dbContext.Set<Product>().Attach(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.UpdateEntity(entity, _mapper);
         }
 
         public async Task DeleteAsync(string id)
         {
-            var entity = await _dbContext.Set<Product>()
-                .SingleOrDefaultAsync(p => p.Id == id);
-
-            if (entity == null) return;
-
-            _dbContext.Set<Product>().Remove(entity);
-            _dbContext.Entry(entity).State = EntityState.Deleted;
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.Delete(new Product { Id = id });
         }
     }
 }

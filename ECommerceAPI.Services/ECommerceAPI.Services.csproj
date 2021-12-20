@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ECommerceAPI.DataAccess\ECommerceAPI.DataAccess.csproj" />
     <ProjectReference Include="..\ECommerceAPI.Dto\ECommerceAPI.Dto.csproj" />
   </ItemGroup>
