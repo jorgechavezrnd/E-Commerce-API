@@ -1,6 +1,7 @@
 using ECommerceAPI.DataAccess;
 using ECommerceAPI.DataAccess.Repositories;
 using ECommerceAPI.Entities;
+using ECommerceAPI.Services;
 using ECommerceAPI.Services.Implementations;
 using ECommerceAPI.Services.Interfaces;
 using ECommerceAPI.Services.Profiles;
@@ -29,16 +30,7 @@ namespace ECommerceAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<ECommerceDbContext>();
-
-            services.AddTransient<ICategoryRepository, CategoryRepository>();
-            services.AddTransient<ICategoryService, CategoryService>();
-
-            services.AddTransient<ICustomerRepository, CustomerRepository>();
-            services.AddTransient<ICustomerService, CustomerService>();
-
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddTransient<IProductService, ProductService>();
+            services.AddInjectionDependency();
 
             services.AddControllers();
 
@@ -49,15 +41,7 @@ namespace ECommerceAPI
                     .EnableSensitiveDataLogging();
             });
 
-            services.AddAutoMapper(options =>
-            {
-                options.AddMaps(typeof(Category));
-                options.AddMaps(typeof(Customer));
-                options.AddMaps(typeof(Product));
-                options.AddProfile<CategoryProfile>();
-                options.AddProfile<CustomerProfile>();
-                options.AddProfile<ProductProfile>();
-            });
+            services.AddAutoMapperConfiguration();
 
             services.AddSwaggerGen(c =>
             {
