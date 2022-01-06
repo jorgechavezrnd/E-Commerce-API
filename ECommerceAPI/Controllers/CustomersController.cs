@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
+using ECommerceAPI.Filters;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -9,6 +10,7 @@ namespace ECommerceAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [TypeFilter(typeof(MitoCodeFilterException))]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _service;
