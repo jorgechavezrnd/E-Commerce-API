@@ -4,6 +4,7 @@ using ECommerceAPI.Entities.Complex;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -58,6 +59,22 @@ namespace ECommerceAPI.DataAccess.Repositories
             await Context.Set<Sale>().AddAsync(entity);
             Context.Entry(entity).State = EntityState.Added;
             return entity;
+        }
+
+        public async Task<ICollection<InvoiceDetailInfo>> GetSaleDetails(string saleId)
+        {
+            return await Context.Set<SaleDetail>()
+                .Where(p => p.SaleId == saleId)
+                .Select(p => new InvoiceDetailInfo
+                {
+                    Id = p.Id,
+                    ItemNumber = p.ItemNumber,
+                    ProductName = p.Product.Name,
+                    Quantity = p.Quantity,
+                    UnitPrice = p.UnitPrice,
+                    Total = p.Total
+                })
+                .ToListAsync();
         }
 
         public async Task CreateSaleDetail(SaleDetail entity)

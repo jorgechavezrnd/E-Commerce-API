@@ -16,6 +16,7 @@ namespace ECommerceAPI.Services
                 options.AddProfile<CategoryProfile>();
                 options.AddProfile<CustomerProfile>();
                 options.AddProfile<ProductProfile>();
+                options.AddProfile<SaleProfile>();
             });
         }
     }

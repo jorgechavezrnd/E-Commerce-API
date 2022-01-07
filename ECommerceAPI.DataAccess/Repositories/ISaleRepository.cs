@@ -11,6 +11,7 @@ namespace ECommerceAPI.DataAccess.Repositories
         Task<(ICollection<InvoiceInfo> collection, int total)> SelectAsync(string dni, int page, int rows);
         Task<(ICollection<InvoiceInfo> collection, int total)> SelectAsync(DateTime dateInit, DateTime dateEnd, int page, int rows);
         Task<(ICollection<InvoiceInfo> collection, int total)> SelectByInvoiceNumber(string invoiceNumber, int page, int rows);
+        Task<ICollection<InvoiceDetailInfo>> GetSaleDetails(string saleId);
         Task<Sale> CreateAsync(Sale entity);
         Task CreateSaleDetail(SaleDetail entity);
         Task CommitTransaction();

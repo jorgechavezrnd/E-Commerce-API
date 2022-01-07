@@ -21,6 +21,9 @@ namespace ECommerceAPI.Services
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddTransient<IProductService, ProductService>();
 
+            services.AddTransient<ISaleRepository, SaleRepository>();
+            services.AddTransient<ISaleService, SaleService>();
+
             return services;
         }
     }

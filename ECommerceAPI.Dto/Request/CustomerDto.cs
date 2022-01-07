@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ECommerceAPI.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace ECommerceAPI.Dto.Request
 {
@@ -17,7 +18,7 @@ namespace ECommerceAPI.Dto.Request
         [EmailAddress(ErrorMessage = "El correo no es valido")]
         public string Email { get; set; }
 
-        [RegularExpression("^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$")]
+        [RegularExpression(Constants.DatePattern)]
         public string BirthDate { get; set; }
 
         [Required]
