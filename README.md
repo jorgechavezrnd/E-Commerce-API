@@ -17,3 +17,6 @@ https://localhost:5001/swagger/index.html
 ## COMMANDS USED DOTNET CLI
 - List migrations: `dotnet-ef migrations list --project .\ECommerceAPI\ECommerceAPI.csproj`
 - Update database with migrations: `dotnet-ef database update --project .\ECommerceAPI\ECommerceAPI.csproj`
+
+## COMMAND FOR START SQL SERVER CONTAINER WITH DOCKER
+- `docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password123" -p 1433:1433 --name sqls_mitocode_netfs -d mcr.microsoft.com/mssql/server:2019-latest`
