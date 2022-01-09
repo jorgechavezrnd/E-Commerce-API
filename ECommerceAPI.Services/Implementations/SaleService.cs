@@ -6,6 +6,7 @@ using ECommerceAPI.Entities;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -164,6 +165,33 @@ namespace ECommerceAPI.Services.Implementations
                 response.Success = false;
                 response.ErrorMessage = ex.Message;
                 await _repository.RollbackTransaction();
+            }
+
+            return response;
+        }
+
+        public async Task<BaseResponse<ICollection<ReportByMonthSingleDto>>> ReportByMonth(int month, int year)
+        {
+            var response = new BaseResponse<ICollection<ReportByMonthSingleDto>>();
+
+            try
+            {
+                var collection = await _repository.GetReportByMonth(month, year);
+                response.Result = collection
+                    .Select(p => new ReportByMonthSingleDto
+                    {
+                        Day = p.Day,
+                        TotalSales = p.TotalSales
+                    })
+                    .ToList();
+
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+                response.Success = false;
+                response.ErrorMessage = ex.Message;
             }
 
             return response;

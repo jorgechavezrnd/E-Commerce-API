@@ -1,6 +1,7 @@
 ﻿using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ECommerceAPI.Services.Interfaces
@@ -12,5 +13,6 @@ namespace ECommerceAPI.Services.Interfaces
         Task<BaseCollectionResponse<SaleDtoSingleResponse>> SelectByDate(DateTime dateInit, DateTime dateEnd, int page, int rows);
         Task<BaseCollectionResponse<SaleDetailSingleResponse>> SelectDetailsAsync(string saleId);
         Task<BaseResponse<string>> CreateAsync(SaleDtoRequest request);
+        Task<BaseResponse<ICollection<ReportByMonthSingleDto>>> ReportByMonth(int month, int year);
     }
 }

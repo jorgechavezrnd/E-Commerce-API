@@ -1,15 +1,14 @@
 using ECommerceAPI.DataAccess;
-using ECommerceAPI.DataAccess.Repositories;
-using ECommerceAPI.Entities;
+using ECommerceAPI.HealthChecks;
 using ECommerceAPI.Services;
-using ECommerceAPI.Services.Implementations;
-using ECommerceAPI.Services.Interfaces;
-using ECommerceAPI.Services.Profiles;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
@@ -52,6 +51,18 @@ namespace ECommerceAPI
                     Description = "API para el curso FullStack"
                 });
             });
+
+            services.AddHealthChecks()
+                .AddCheck("ECommerceAPI", _ => HealthCheckResult.Healthy(), new[] { "servicio" })
+                .AddTypeActivatedCheck<PingHealthCheck>("Base de Datos", HealthStatus.Healthy,
+                                                        new[] { "basedatos" },
+                                                        new object[] { Configuration.GetValue<string>("IPServidor") })
+                .AddTypeActivatedCheck<PingHealthCheck>("Google", HealthStatus.Healthy,
+                                                        new[] { "internet" }, "google.com")
+                .AddTypeActivatedCheck<PingHealthCheck>("Azure", HealthStatus.Healthy,
+                                                        new[] { "nube" }, "portal.azure.com")
+                .AddDbContextCheck<ECommerceDbContext>("EF Core", HealthStatus.Healthy,
+                                                        new[] { "basedatos" });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,6 +84,23 @@ namespace ECommerceAPI
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                {
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+
+                endpoints.MapHealthChecks("/health/externos", new HealthCheckOptions
+                {
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+                    Predicate = x => x.Tags.Contains("nube")
+                });
+
+                endpoints.MapHealthChecks("/health/internos", new HealthCheckOptions
+                {
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+                    Predicate = x => x.Tags.Contains("basedatos")
+                });
+
                 endpoints.MapControllers();
             });
         }

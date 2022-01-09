@@ -60,6 +60,13 @@ namespace ECommerceAPI.DataAccess
                 .Property(p => p.Total)
                 .HasPrecision(8, 2);
 
+            modelBuilder.Entity<ReportByMonthInfo>()
+                .HasNoKey();
+
+            modelBuilder.Entity<ReportByMonthInfo>()
+                .Property(p => p.TotalSales)
+                .HasPrecision(8, 2);
+
             #endregion
         }
 

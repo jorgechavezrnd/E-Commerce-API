@@ -4,6 +4,7 @@ using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ECommerceAPI.Controllers
@@ -66,6 +67,19 @@ namespace ECommerceAPI.Controllers
                 return Ok(response);
 
             return NotFound(response);
+        }
+
+        [HttpGet]
+        [Route("Report")]
+        [SwaggerResponse(200, "Ok", typeof(BaseResponse<ICollection<ReportByMonthSingleDto>>))]
+        [SwaggerResponse(400, "Bad Request", typeof(BaseResponse<ICollection<ReportByMonthSingleDto>>))]
+        public async Task<IActionResult> ReportByMonth([FromQuery] int month, int year)
+        {
+            var response = await _service.ReportByMonth(month, year);
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
         }
     }
 }

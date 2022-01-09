@@ -16,5 +16,6 @@ namespace ECommerceAPI.DataAccess.Repositories
         Task CreateSaleDetail(SaleDetail entity);
         Task CommitTransaction();
         Task RollbackTransaction();
+        Task<ICollection<ReportByMonthInfo>> GetReportByMonth(int month, int year);
     }
 }

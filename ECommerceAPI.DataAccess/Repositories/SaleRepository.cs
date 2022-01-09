@@ -63,18 +63,23 @@ namespace ECommerceAPI.DataAccess.Repositories
 
         public async Task<ICollection<InvoiceDetailInfo>> GetSaleDetails(string saleId)
         {
-            return await Context.Set<SaleDetail>()
-                .Where(p => p.SaleId == saleId)
-                .Select(p => new InvoiceDetailInfo
-                {
-                    Id = p.Id,
-                    ItemNumber = p.ItemNumber,
-                    ProductName = p.Product.Name,
-                    Quantity = p.Quantity,
-                    UnitPrice = p.UnitPrice,
-                    Total = p.Total
-                })
-                .ToListAsync();
+            //return await Context.Set<SaleDetail>()
+            //    .Where(p => p.SaleId == saleId)
+            //    .Select(p => new InvoiceDetailInfo
+            //    {
+            //        Id = p.Id,
+            //        ItemNumber = p.ItemNumber,
+            //        ProductName = p.Product.Name,
+            //        Quantity = p.Quantity,
+            //        UnitPrice = p.UnitPrice,
+            //        Total = p.Total
+            //    })
+            //    .ToListAsync();
+
+            var collection = Context.Set<InvoiceDetailInfo>()
+                .FromSqlRaw("EXEC uspSelectDetails {0}", saleId);
+
+            return await collection.ToListAsync();
         }
 
         public async Task CreateSaleDetail(SaleDetail entity)
@@ -92,6 +97,14 @@ namespace ECommerceAPI.DataAccess.Repositories
         public async Task RollbackTransaction()
         {
             await Context.Database.RollbackTransactionAsync();
+        }
+
+        public async Task<ICollection<ReportByMonthInfo>> GetReportByMonth(int month, int year)
+        {
+            var collection = Context.Set<ReportByMonthInfo>()
+                .FromSqlRaw("EXEC uspReportByMonth {0}, {1}", month, year);
+
+            return await collection.ToListAsync();
         }
     }
 }
