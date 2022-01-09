@@ -24,6 +24,8 @@ namespace ECommerceAPI.Services
             services.AddTransient<ISaleRepository, SaleRepository>();
             services.AddTransient<ISaleService, SaleService>();
 
+            services.AddSingleton<IFileUploader, FileUploader>();
+
             return services;
         }
     }

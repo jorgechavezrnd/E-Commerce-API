@@ -16,12 +16,14 @@ namespace ECommerceAPI.Services.Implementations
         private readonly IProductRepository _repository;
         private readonly ILogger<ProductService> _logger;
         private readonly IMapper _mapper;
+        private readonly IFileUploader _fileUploader;
 
-        public ProductService(IProductRepository repository, ILogger<ProductService> logger, IMapper mapper)
+        public ProductService(IProductRepository repository, ILogger<ProductService> logger, IMapper mapper, IFileUploader fileUploader)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _fileUploader = fileUploader;
         }
 
         public async Task<ProductDtoCollectionResponse> ListAsync(string filter, int page, int rows)
@@ -91,6 +93,8 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
+                request.UrlImage = await _fileUploader.UploadAsync(request.Base64Image, request.FileName);
+
                 var product = _mapper.Map<Product>(request);
 
                 response.Result = await _repository.CreateAsync(product);
@@ -115,6 +119,9 @@ namespace ECommerceAPI.Services.Implementations
             {
                 var product = _mapper.Map<Product>(request);
                 product.Id = id;
+
+                if (!string.IsNullOrEmpty(request.FileName))
+                    product.ProductUrl = await _fileUploader.UploadAsync(request.Base64Image, request.FileName);
 
                 await _repository.UpdateAsync(product);
 

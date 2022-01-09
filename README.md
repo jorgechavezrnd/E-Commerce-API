@@ -75,3 +75,6 @@ exec uspSelectDetails 'ca763cd0-ff2c-42ad-a060-2e4cdf2f926e'
 
 EXEC uspReportByMonth 10, 2021
 ```
+
+## NOTE FOR FILE UPLOADER ON CREATE PRODUCTS WITH IMAGES
+- Create this folder structure: `D:\Servidor\Imagenes`
