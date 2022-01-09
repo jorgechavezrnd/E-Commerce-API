@@ -1,10 +1,11 @@
 ﻿using ECommerceAPI.Entities;
 using ECommerceAPI.Entities.Complex;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceAPI.DataAccess
 {
-    public class ECommerceDbContext : DbContext
+    public class ECommerceDbContext : IdentityDbContext<ECommerceUserIdentity>
     {
         public ECommerceDbContext()
         {
