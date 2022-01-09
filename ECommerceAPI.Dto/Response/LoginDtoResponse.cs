@@ -14,6 +14,6 @@ namespace ECommerceAPI.Dto.Response
         public string CustomerId { get; set; }
         public string UserCode { get; set; }
         public string FullName { get; set; }
-        public List<MenuOption> MenuOptions { get; set; }
+        public ICollection<MenuOption> MenuOptions { get; set; }
     }
 }

@@ -26,6 +26,8 @@ namespace ECommerceAPI.Services
 
             services.AddSingleton<IFileUploader, FileUploader>();
 
+            services.AddTransient<IUserService, UserService>();
+
             return services;
         }
     }

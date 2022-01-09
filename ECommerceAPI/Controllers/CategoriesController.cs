@@ -1,12 +1,14 @@
 ﻿using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
 using ECommerceAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading.Tasks;
 
 namespace ECommerceAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
