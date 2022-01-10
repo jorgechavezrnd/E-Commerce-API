@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
+using ECommerceAPI.Entities;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
@@ -21,6 +21,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.RoleMixed)]
         [SwaggerResponse(200, "Ok", typeof(CategoryDtoCollectionResponse))]
         public async Task<IActionResult> GetCategories(string filter, int page = 1, int rows = 10)
         {
@@ -28,6 +29,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [Route("{id}")]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<CategoryDto>))]
         [SwaggerResponse(404, "Not Found", typeof(BaseResponse<CategoryDto>))]
@@ -44,6 +46,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [SwaggerResponse(201, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> PostCategories([FromBody] CategoryRequest request)
         {
@@ -56,6 +59,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [Route("{id}")]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> PutCategories(string id, [FromBody] CategoryRequest request)
@@ -64,6 +68,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [Route("{id}")]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> DeleteCategories(string id)

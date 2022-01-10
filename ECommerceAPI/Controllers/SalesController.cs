@@ -1,6 +1,8 @@
 ﻿using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
+using ECommerceAPI.Entities;
 using ECommerceAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -21,6 +23,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("List")]
         [SwaggerResponse(200, "Ok", typeof(BaseCollectionResponse<SaleDtoSingleResponse>))]
         public async Task<IActionResult> List([FromQuery] int page = 1, int rows = 10,
@@ -42,6 +45,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.RoleMixed)]
         [Route("Create")]
         [SwaggerResponse(201, "Created", typeof(BaseResponse<string>))]
         [SwaggerResponse(400, "Bad Request", typeof(BaseResponse<string>))]
@@ -56,6 +60,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.RoleMixed)]
         [Route("GetDetails/{saleId}")]
         [SwaggerResponse(200, "Ok", typeof(BaseCollectionResponse<SaleDetailSingleResponse>))]
         [SwaggerResponse(404, "Not Found", typeof(BaseCollectionResponse<SaleDetailSingleResponse>))]
@@ -70,6 +75,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [Route("Report")]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<ICollection<ReportByMonthSingleDto>>))]
         [SwaggerResponse(400, "Bad Request", typeof(BaseResponse<ICollection<ReportByMonthSingleDto>>))]

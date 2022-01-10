@@ -8,6 +8,6 @@
 
         public const string RoleAdministrator = "Administrator";
         public const string RoleCustomer = "Customer";
-        public const string RoleMixed = "Administrator, Customer";
+        public const string RoleMixed = "Customer, Administrator";
     }
 }

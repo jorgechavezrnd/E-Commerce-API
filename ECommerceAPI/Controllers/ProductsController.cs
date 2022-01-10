@@ -1,6 +1,8 @@
 ﻿using ECommerceAPI.Dto.Request;
 using ECommerceAPI.Dto.Response;
+using ECommerceAPI.Entities;
 using ECommerceAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading.Tasks;
@@ -19,6 +21,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.RoleMixed)]
         [SwaggerResponse(200, "Ok", typeof(ProductDtoCollectionResponse))]
         public async Task<ActionResult<ProductDtoCollectionResponse>> Get(string filter, int page = 1, int rows = 10)
         {
@@ -28,6 +31,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<ProductSingleDto>))]
         [SwaggerResponse(404, "Not Found", typeof(BaseResponse<ProductSingleDto>))]
         public async Task<ActionResult<BaseResponse<ProductSingleDto>>> GetProduct(string id)
@@ -43,6 +47,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> PutProduct(string id, [FromBody] ProductDtoRequest request)
         {
@@ -52,6 +57,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [SwaggerResponse(201, "Created", typeof(BaseResponse<string>))]
         public async Task<ActionResult<BaseResponse<string>>> PostProduct([FromBody] ProductDtoRequest request)
         {
@@ -61,6 +67,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = Constants.RoleAdministrator)]
         [SwaggerResponse(200, "Ok", typeof(BaseResponse<string>))]
         public async Task<IActionResult> DeleteProduct(string id)
         {
