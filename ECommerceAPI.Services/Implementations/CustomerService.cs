@@ -30,18 +30,14 @@ namespace ECommerceAPI.Services.Implementations
 
             try
             {
-                var tupla = await _repository
+                var tuple = await _repository
                     .GetCollectionAsync(filter ?? string.Empty, page, rows);
 
-                response.Collection = tupla.collection
+                response.Collection = tuple.collection
                     .Select(c => _mapper.Map<CustomerDto>(c))
                     .ToList();
 
-                var totalPages = tupla.total / rows;
-                if (tupla.total % rows > 0)
-                    totalPages++;
-
-                response.TotalPages = totalPages;
+                response.TotalPages = ECommerceUtils.GetTotalPages(tuple.total, rows);
                 response.Success = true;
             }
             catch (Exception ex)

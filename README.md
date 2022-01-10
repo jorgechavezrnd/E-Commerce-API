@@ -18,6 +18,8 @@ https://localhost:5001/swagger/index.html
 - List migrations: `dotnet-ef migrations list --project .\ECommerceAPI\ECommerceAPI.csproj`
 - Update database with migrations: `dotnet-ef database update --project .\ECommerceAPI\ECommerceAPI.csproj` Or `dotnet-ef database update -s .\ECommerceAPI\ECommerceAPI.csproj`
 - Add migration for Security Tables: `dotnet-ef migrations add TablasSeguridad -s .\ECommerceAPI\ECommerceAPI.csproj --project .\ECommerceAPI.DataAccess\ECommerceAPI.DataAccess.csproj`
+- Create project for unit tests: `dotnet new xunit -o ECommerceAPI.UnitTests`
+- Add the unit tests project to solution: `dotnet sln add .\ECommerceAPI.UnitTests\ECommerceAPI.UnitTests.csproj`
 
 ## COMMAND FOR START SQL SERVER CONTAINER WITH DOCKER
 - `docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password123" -p 1433:1433 --name sqls_mitocode_netfs -d mcr.microsoft.com/mssql/server:2019-latest`
